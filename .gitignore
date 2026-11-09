@@ -6,3 +6,5 @@ dist/
 scratch/
 eval/repos/*/
 !eval/repos/README.md
+graphify-out/
+.idea/
