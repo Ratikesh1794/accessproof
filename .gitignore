@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+.env.*
+.accessproof/
+scratch/
+eval/repos/*/
+!eval/repos/README.md

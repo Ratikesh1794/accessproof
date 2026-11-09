@@ -1,0 +1,39 @@
+# Hand-labelled INTENT for demo/vulnerable-app — what a careful human would want, not what the migrations do.
+version: 1
+project: { framework: nextjs, backend: supabase }
+roles:
+  anon: {}
+  user: {}
+resources:
+  profiles:
+    kind: table
+    owner: id
+    confirmed: true
+    rules:
+      user: { read: own, update: own }
+  orders:
+    kind: table
+    owner: user_id
+    confirmed: true
+    rules:
+      user: { read: own, insert: own, update: own, delete: own }
+  notes:
+    kind: table
+    owner: user_id
+    confirmed: true
+    rules:
+      user: { read: own, insert: own, update: own, delete: own }
+  posts:
+    kind: table
+    owner: author_id
+    confirmed: true
+    rules:
+      anon: { read: all }
+      user: { read: all, insert: own, update: own, delete: own }
+  avatars:
+    kind: bucket
+    owner_path: "{uid}/*"
+    confirmed: true
+    rules:
+      anon: { read: all }
+      user: { read: all, insert: own, update: own, delete: own }

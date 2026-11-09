@@ -1,0 +1,34 @@
+# Copy to .github/workflows/accessproof.yml
+# TEMPLATE: not yet run against a live repository. Adjust versions and `supabase start` flags for your project.
+name: accessproof
+on:
+  pull_request:
+    paths: ["supabase/**", "app/api/**", "pages/api/**", "access.yml"]
+
+jobs:
+  access-control:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+
+      # Fast, no database: RLS gaps, allow-everything policies, leaked keys, unprotected service_role routes.
+      - run: npx -y accessproof check --fail-on high
+
+      # Prove every rule against a throwaway local Supabase. Unconfirmed rules also fail in CI (--strict).
+      - run: supabase start -x studio,imgproxy,inbucket,edge-runtime,logflare,vector
+      - name: Export local keys
+        run: |
+          supabase status -o env | sed 's/"//g' > "$RUNNER_TEMP/supabase.env"
+          . "$RUNNER_TEMP/supabase.env"
+          echo "::add-mask::$SERVICE_ROLE_KEY"
+          echo "SUPABASE_ANON_KEY=$ANON_KEY" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY" >> "$GITHUB_ENV"
+      - run: npx -y accessproof test --strict
+
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with: { name: accessproof-report, path: .accessproof/ }

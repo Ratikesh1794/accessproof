@@ -1,0 +1,55 @@
+# access.yml — the source of truth for who may do what in this app.
+# Drafted by `accessproof infer`, confirmed by a human, enforced by `accessproof test`.
+version: 1
+
+project:
+  framework: nextjs
+  backend: supabase
+
+# Every role gets a seeded test identity when tests run.
+roles:
+  anon:
+    description: Not signed in
+  user:
+    description: Any signed-in user
+  admin:
+    description: Internal admin
+    # How the app decides someone is an admin (used to seed the admin test user).
+    seed:
+      table: profiles
+      set: { role: admin }
+
+resources:
+  orders:
+    kind: table
+    owner: user_id            # column that holds auth.uid() of the row owner
+    confirmed: true           # a human has approved these rules
+    rules:
+      anon:  { read: none, insert: none, update: none, delete: none }
+      user:  { read: own,  insert: own,  update: own,  delete: none }
+      admin: { read: all,  update: all,  delete: all }
+
+  posts:
+    kind: table
+    owner: author_id
+    confirmed: true
+    notes: Public feed — anonymous reads are intended.
+    rules:
+      anon:  { read: all }
+      user:  { read: all, insert: own, update: own, delete: own }
+
+  profiles:
+    kind: table
+    owner: id
+    confirmed: false          # inferred, still waiting for human review
+    rules:
+      user:  { read: own, update: own }
+      admin: { read: all, update: all }
+
+  avatars:
+    kind: bucket
+    owner_path: "{uid}/*"     # objects live under the owner's user id
+    confirmed: true
+    rules:
+      anon:  { read: all }
+      user:  { read: all, insert: own, update: own, delete: own }

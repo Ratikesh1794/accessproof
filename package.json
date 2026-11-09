@@ -1,0 +1,56 @@
+{
+  "name": "accessproof",
+  "version": "0.1.0",
+  "description": "Security tests your AI can't break: prove who can access what in your Next.js + Supabase app, then let Claude Code fix it.",
+  "type": "module",
+  "bin": {
+    "accessproof": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "test": "vitest run",
+    "eval": "tsx eval/run.ts",
+    "prepack": "npm run build",
+    "validate:example": "tsx src/cli.ts validate examples/access.yml"
+  },
+  "keywords": [
+    "security",
+    "supabase",
+    "rls",
+    "row-level-security",
+    "nextjs",
+    "vibe-coding",
+    "claude-code",
+    "mcp",
+    "idor",
+    "access-control"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "commander": "^12.1.0",
+    "yaml": "^2.5.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.23.1",
+    "pg": "^8.23.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "files": [
+    "dist",
+    "examples",
+    "skills",
+    "templates",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ]
+}
